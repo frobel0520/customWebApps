@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>計時器</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #1a1a1a;
+      color: #e8e8e6;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: #222;
+      border: 1px solid #2e2e2e;
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
+      width: 360px;
+      text-align: center;
+    }
+
+    .card-title {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 1.5rem;
+    }
+
+    .set-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .set-row label { font-size: 13px; color: #666; }
+
+    .set-row input {
+      width: 64px;
+      text-align: center;
+      font-size: 16px;
+      padding: 6px 8px;
+      border: 1px solid #333;
+      border-radius: 8px;
+      outline: none;
+      background: #2a2a2a;
+      color: #e8e8e6;
+      transition: border-color 0.15s;
+    }
+
+    .set-row input:focus { border-color: #378ADD; }
+
+    .timer-display {
+      font-size: 72px;
+      font-weight: 500;
+      color: #f0f0ee;
+      letter-spacing: 3px;
+      font-variant-numeric: tabular-nums;
+      margin: 0.5rem 0 0.75rem;
+      transition: color 0.3s;
+    }
+
+    .timer-display.running { color: #5DCAA5; }
+    .timer-display.finished { color: #F09595; }
+
+    .status-label {
+      font-size: 13px;
+      color: #666;
+      min-height: 20px;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-row { display: flex; gap: 8px; justify-content: center; }
+
+    button {
+      padding: 8px 20px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background: #2a2a2a;
+      color: #e8e8e6;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    button:hover { background: #333; }
+    button:active { transform: scale(0.97); }
+
+    button#btn-start {
+      background: #185FA5;
+      color: #fff;
+      border-color: #185FA5;
+    }
+
+    button#btn-start:hover { background: #378ADD; border-color: #378ADD; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <p class="card-title">設定時間</p>
+    <div class="set-row">
+      <label>分鐘</label>
+      <input type="number" id="inp-min" min="0" max="99" value="0">
+      <label>秒</label>
+      <input type="number" id="inp-sec" min="0" max="59" value="10">
+    </div>
+    <div class="timer-display" id="display">00:10</div>
+    <div class="status-label" id="status"></div>
+    <div class="btn-row">
+      <button id="btn-start" onclick="startTimer()">開始</button>
+      <button id="btn-pause" onclick="pauseTimer()" style="display:none">暫停</button>
+      <button onclick="resetTimer()">重設</button>
+    </div>
+  </div>
+  <script>
+    let remaining = 10, interval = null, running = false;
+    const display = document.getElementById('display');
+    const status = document.getElementById('status');
+    const btnStart = document.getElementById('btn-start');
+    const btnPause = document.getElementById('btn-pause');
+    const inpMin = document.getElementById('inp-min');
+    const inpSec = document.getElementById('inp-sec');
+
+    function fmt(s) {
+      return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+    }
+
+    function startTimer() {
+      if (!running) {
+        if (!interval) {
+          remaining = (parseInt(inpMin.value)||0)*60 + (parseInt(inpSec.value)||0);
+          if (remaining <= 0) return;
+          display.textContent = fmt(remaining);
+        }
+        running = true;
+        display.className = 'timer-display running';
+        status.textContent = '計時中...';
+        btnStart.style.display = 'none';
+        btnPause.style.display = '';
+        interval = setInterval(() => {
+          display.textContent = fmt(--remaining);
+          if (remaining <= 0) {
+            clearInterval(interval); interval = null; running = false;
+            display.className = 'timer-display finished';
+            status.textContent = '時間到！';
+            btnPause.style.display = 'none';
+            btnStart.style.display = '';
+            btnStart.textContent = '重新開始';
+          }
+        }, 1000);
+      }
+    }
+
+    function pauseTimer() {
+      if (running) {
+        clearInterval(interval); interval = null; running = false;
+        display.className = 'timer-display';
+        status.textContent = '已暫停';
+        btnPause.style.display = 'none';
+        btnStart.style.display = '';
+        btnStart.textContent = '繼續';
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(interval); interval = null; running = false;
+      display.className = 'timer-display';
+      display.textContent = '00:00';
+      status.textContent = '';
+      btnStart.style.display = ''; btnStart.textContent = '開始';
+      btnPause.style.display = 'none';
+      inpMin.value = 0; inpSec.value = 10;
+    }
+  </script>
+</body>
+</html>
