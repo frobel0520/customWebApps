@@ -21,18 +21,6 @@
             min-height: 100vh;
         }
 
-        /* 標題樣式 */
-        .page-title {
-            color: white;
-            text-align: center;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-            background: rgba(0,0,0,0.4);
-            padding: 15px;
-            border-radius: 10px;
-            margin: 0 auto 20px auto;
-            max-width: 500px;
-        }
-
         .map-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -63,6 +51,7 @@
             margin-bottom: 8px;
         }
 
+        /* 輸入框排列：時、分、秒 */
         .input-row {
             display: flex;
             gap: 4px;
@@ -78,6 +67,7 @@
             font-size: 0.9em;
         }
 
+        /* 設定按鈕：寬版顯示完整文字 */
         .set-btn {
             width: 100%;
             padding: 10px;
@@ -105,13 +95,10 @@
 
         @media (max-width: 900px) {
             .map-grid { grid-template-columns: repeat(2, 1fr); }
-            .page-title { font-size: 1.5em; width: 90%; }
         }
     </style>
 </head>
 <body>
-
-<h1 class="page-title">溪洲區域蘑菇戰情室</h1>
 
 <div class="map-grid" id="mapGrid">
     <div class="column" id="col1"></div>
@@ -121,9 +108,10 @@
 </div>
 
 <script>
+    // 溪洲區域點位配置
     const points = {
         col1: ["水源運動公園", "豐田甲天下", "欣岳逸境", "基督教會"],
-        col2: ["無名神像祠", "溪洲公園", "神秘維納斯", "指示牌"],
+        col2: ["無名神像嗣", "溪洲公園", "神秘維納斯", "指示牌"],
         col3: ["天地一沙變電箱", "麒麟天地"],
         col4: ["溪北公園"]
     };
@@ -141,7 +129,7 @@
                             <input type="number" id="m-${name}" placeholder="分" min="0" max="59">
                             <input type="number" id="s-${name}" placeholder="秒" min="0" max="59">
                         </div>
-                        <button class="set-btn" onclick="calculateRebirth('${name}')">開始倒數</button>
+                        <button class="set-btn" onclick="calculateRebirth('${name}')">設定重生</button>
                         <button class="clear-btn" onclick="clearTimer('${name}')">清除數據</button>
                     </div>
                 `;
@@ -156,12 +144,14 @@
         const s = parseInt(document.getElementById(`s-${name}`).value) || 0;
 
         const now = Date.now();
+        // 剩餘時間 + 5分鐘緩衝
         const remainingMs = (h * 3600 + m * 60 + s) * 1000;
         const bufferMs = 5 * 60 * 1000;
         const rebirthTime = now + remainingMs + bufferMs;
 
         localStorage.setItem(`mush_${name}`, rebirthTime);
         
+        // 清空輸入
         document.getElementById(`h-${name}`).value = '';
         document.getElementById(`m-${name}`).value = '';
         document.getElementById(`s-${name}`).value = '';
