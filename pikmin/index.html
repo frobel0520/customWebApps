@@ -98,12 +98,18 @@
         }
     
         .input-row input {
-            width: 28px; /* 固定輸入框寬度 */
+            width: 40px; /* 固定輸入框寬度 */
             padding: 4px 0;
             border: 1px solid #bbb;
             border-radius: 4px;
             text-align: center;
             font-size: 0.8rem;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
     
         .set-btn {
