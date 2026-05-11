@@ -3,88 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>溪洲區域蘑菇戰情室</title>
+    <title>蘑菇戰情室</title>
     <style>
         :root {
-            --glass: rgba(255, 255, 255, 0.8);
+            --glass: rgba(255, 255, 255, 0.85);
             --accent: #2d5a27;
         }
 
         body {
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             font-family: "Microsoft JhengHei", sans-serif;
-            /* 直接讀取同資料夾下的 bg.jpg */
-            background-image: url('Pikmin.jpg');
+            background-image: url('bg.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             min-height: 100vh;
         }
 
-        h2 {
-            color: white;
-            text-align: center;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
-            background: rgba(0,0,0,0.3);
-            padding: 10px;
-            border-radius: 10px;
-        }
-
-        /* 4, 4, 2, 1 排列的 Grid */
         .map-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
+            gap: 10px;
             max-width: 1200px;
             margin: 0 auto;
         }
 
-        .column {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+        .column { display: flex; flex-direction: column; gap: 10px; }
 
         .mush-card {
             background: var(--glass);
-            padding: 12px;
-            border-radius: 12px;
+            padding: 10px;
+            border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-top: 4px solid var(--accent);
+            border-top: 3px solid var(--accent);
         }
 
-        .mush-name {
-            font-weight: bold;
-            font-size: 1.1em;
-            color: #1a1a1a;
-            margin-bottom: 8px;
-            display: block;
-        }
+        .mush-name { font-weight: bold; font-size: 1em; color: #1a1a1a; }
 
         .timer-display {
-            font-family: monospace;
-            font-size: 1.3em;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.2em;
             color: #d32f2f;
+            font-weight: bold;
             display: block;
             margin: 5px 0;
         }
 
-        .input-group {
+        /* 調整輸入框樣式 */
+        .input-row {
             display: flex;
-            gap: 5px;
-            margin-top: 8px;
+            gap: 2px;
+            margin-top: 5px;
         }
 
-        input[type="time"] {
+        .input-row input {
+            width: 30%;
             padding: 4px;
             border: 1px solid #ccc;
-            border-radius: 4px;
-            flex: 1;
+            border-radius: 3px;
+            text-align: center;
+            font-size: 0.8em;
         }
 
-        button {
-            padding: 4px 8px;
+        .set-btn {
+            width: 100%;
+            margin-top: 5px;
+            padding: 6px;
             background: var(--accent);
             color: white;
             border: none;
@@ -93,98 +78,90 @@
         }
 
         .clear-btn {
-            background: #666;
-            font-size: 0.8em;
-            margin-top: 5px;
+            background: #999;
+            font-size: 0.7em;
+            margin-top: 3px;
+            border: none;
+            color: white;
+            padding: 2px;
+            border-radius: 3px;
+            width: 100%;
         }
 
-        /* 手機版自動調整為 2 欄 */
-        @media (max-width: 800px) {
+        @media (max-width: 900px) {
             .map-grid { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
 <body>
 
-<h2>🍄 溪洲區域蘑菇重生看板</h2>
-
 <div class="map-grid" id="mapGrid">
-    <div class="column" id="col1"></div> <div class="column" id="col2"></div> <div class="column" id="col3"></div> <div class="column" id="col4"></div> </div>
+    <div class="column" id="col1"></div>
+    <div class="column" id="col2"></div>
+    <div class="column" id="col3"></div>
+    <div class="column" id="col4"></div>
+</div>
 
 <script>
-    // 點位資料定義
     const points = {
         col1: ["水源運動公園", "豐田甲天下", "欣岳逸境", "基督教會"],
-        col2: ["無名神像", "溪洲公園", "神秘維納斯", "指示牌"],
+        col2: ["無名神像嗣", "溪洲公園", "神秘維納斯", "指示牌"],
         col3: ["天地一沙鷗變電箱", "麒麟天地"],
         col4: ["溪北公園"]
     };
 
-    // 初始化介面
     function init() {
         Object.keys(points).forEach(colId => {
             const colEl = document.getElementById(colId);
             points[colId].forEach(name => {
-                colEl.innerHTML += createCard(name);
+                colEl.innerHTML += `
+                    <div class="mush-card">
+                        <span class="mush-name">${name}</span>
+                        <span class="timer-display" id="timer-${name}">--:--:--</span>
+                        <div class="input-row">
+                            <input type="number" id="h-${name}" placeholder="時" min="0">
+                            <input type="number" id="m-${name}" placeholder="分" min="0" max="59">
+                            <input type="number" id="s-${name}" placeholder="秒" min="0" max="59">
+                        </div>
+                        <button class="set-btn" onclick="calculateRebirth('${name}')">設定</button>
+                        <button class="clear-btn" onclick="clearTimer('${name}')">清除</button>
+                    </div>
+                `;
             });
         });
-        loadData();
         setInterval(updateAllTimers, 1000);
     }
 
-    function createCard(name) {
-        return `
-            <div class="mush-card">
-                <span class="mush-name">${name}</span>
-                <span class="timer-display" id="timer-${name}">--:--:--</span>
-                <div class="input-group">
-                    <input type="time" id="input-${name}">
-                    <button onclick="setTimer('${name}')">設</button>
-                </div>
-                <button class="clear-btn" onclick="clearTimer('${name}')">清除</button>
-            </div>
-        `;
-    }
+    function calculateRebirth(name) {
+        const h = parseInt(document.getElementById(`h-${name}`).value) || 0;
+        const m = parseInt(document.getElementById(`m-${name}`).value) || 0;
+        const s = parseInt(document.getElementById(`s-${name}`).value) || 0;
 
-    function setTimer(name) {
-        const timeVal = document.getElementById(`input-${name}`).value;
-        if (!timeVal) return;
+        if (h === 0 && m === 0 && s === 0) return;
 
-        const now = new Date();
-        const [hrs, mins] = timeVal.split(':').map(Number);
-        let targetDate = new Date();
-        targetDate.setHours(hrs, mins, 0, 0);
+        const now = Date.now();
+        // 總毫秒數 = (輸入的剩餘時間 + 5分鐘緩衝) 換算成毫秒
+        const remainingMs = (h * 3600 + m * 60 + s) * 1000;
+        const bufferMs = 5 * 60 * 1000;
+        const rebirthTime = now + remainingMs + bufferMs;
 
-        if (targetDate < now) targetDate.setDate(targetDate.getDate() + 1);
-
-        // 消失時間 + 5 分鐘
-        const rebirthTime = targetDate.getTime() + (5 * 60 * 1000);
+        localStorage.setItem(`mush_${name}`, rebirthTime);
         
-        saveData(name, rebirthTime);
+        // 清空輸入框
+        document.getElementById(`h-${name}`).value = '';
+        document.getElementById(`m-${name}`).value = '';
+        document.getElementById(`s-${name}`).value = '';
     }
 
     function clearTimer(name) {
         localStorage.removeItem(`mush_${name}`);
-        document.getElementById(`timer-${name}`).innerText = "--:--:--";
-        document.getElementById(`timer-${name}`).style.color = "#d32f2f";
-    }
-
-    function saveData(name, timestamp) {
-        localStorage.setItem(`mush_${name}`, timestamp);
-    }
-
-    function loadData() {
-        // 資料會透過 updateAllTimers 自動讀取 localStorage
     }
 
     function updateAllTimers() {
         const now = Date.now();
-        const allNames = Object.values(points).flat();
-        
-        allNames.forEach(name => {
+        Object.values(points).flat().forEach(name => {
             const target = localStorage.getItem(`mush_${name}`);
             const display = document.getElementById(`timer-${name}`);
-            
             if (!target) return;
 
             const diff = target - now;
@@ -192,10 +169,11 @@
                 display.innerText = "🍄 已重生！";
                 display.style.color = "#2d5a27";
             } else {
-                const h = Math.floor(diff / 3600000);
-                const m = Math.floor((diff % 3600000) / 60000);
-                const s = Math.floor((diff % 60000) / 1000);
-                display.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                const totalSec = Math.floor(diff / 1000);
+                const hrs = Math.floor(totalSec / 3600);
+                const mins = Math.floor((totalSec % 3600) / 60);
+                const secs = totalSec % 60;
+                display.innerText = `${hrs.toString().padStart(2,'0')}:${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
                 display.style.color = "#d32f2f";
             }
         });
@@ -203,6 +181,5 @@
 
     init();
 </script>
-
 </body>
 </html>
