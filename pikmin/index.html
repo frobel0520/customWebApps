@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>蘑菇戰情室</title>
+    <title>溪洲區域蘑菇戰情室</title>
     <style>
         :root {
-            --glass: rgba(255, 255, 255, 0.85);
+            --glass: rgba(255, 255, 255, 0.88);
             --accent: #2d5a27;
         }
 
@@ -14,7 +14,7 @@
             margin: 0;
             padding: 15px;
             font-family: "Microsoft JhengHei", sans-serif;
-            background-image: url('bg.jpg');
+            background-image: url('bg.jpg'); /* 從 Repo 讀取背景圖 */
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -24,68 +24,73 @@
         .map-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+            gap: 12px;
             max-width: 1200px;
             margin: 0 auto;
         }
 
-        .column { display: flex; flex-direction: column; gap: 10px; }
+        .column { display: flex; flex-direction: column; gap: 12px; }
 
         .mush-card {
             background: var(--glass);
-            padding: 10px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-top: 3px solid var(--accent);
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            border-top: 5px solid var(--accent);
+            text-align: center;
         }
 
-        .mush-name { font-weight: bold; font-size: 1em; color: #1a1a1a; }
+        .mush-name { font-weight: bold; font-size: 1.1em; color: #1a1a1a; display: block; margin-bottom: 5px; }
 
         .timer-display {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 1.2em;
+            font-size: 1.4em;
             color: #d32f2f;
             font-weight: bold;
             display: block;
-            margin: 5px 0;
+            margin-bottom: 8px;
         }
 
-        /* 調整輸入框樣式 */
+        /* 輸入框排列：時、分、秒 */
         .input-row {
             display: flex;
-            gap: 2px;
-            margin-top: 5px;
+            gap: 4px;
+            margin-bottom: 8px;
         }
 
         .input-row input {
-            width: 30%;
-            padding: 4px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
+            width: 100%;
+            padding: 6px 2px;
+            border: 1px solid #bbb;
+            border-radius: 5px;
             text-align: center;
-            font-size: 0.8em;
+            font-size: 0.9em;
         }
 
+        /* 設定按鈕：寬版顯示完整文字 */
         .set-btn {
             width: 100%;
-            margin-top: 5px;
-            padding: 6px;
+            padding: 10px;
             background: var(--accent);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1em;
             cursor: pointer;
+            transition: background 0.2s;
         }
 
+        .set-btn:active { background: #1b3d17; }
+
         .clear-btn {
-            background: #999;
-            font-size: 0.7em;
-            margin-top: 3px;
+            background: transparent;
+            color: #666;
+            font-size: 0.8em;
+            margin-top: 8px;
             border: none;
-            color: white;
-            padding: 2px;
-            border-radius: 3px;
-            width: 100%;
+            text-decoration: underline;
+            cursor: pointer;
         }
 
         @media (max-width: 900px) {
@@ -103,10 +108,11 @@
 </div>
 
 <script>
+    // 溪洲區域點位配置
     const points = {
         col1: ["水源運動公園", "豐田甲天下", "欣岳逸境", "基督教會"],
         col2: ["無名神像嗣", "溪洲公園", "神秘維納斯", "指示牌"],
-        col3: ["天地一沙鷗變電箱", "麒麟天地"],
+        col3: ["天地一沙變電箱", "麒麟天地"],
         col4: ["溪北公園"]
     };
 
@@ -123,8 +129,8 @@
                             <input type="number" id="m-${name}" placeholder="分" min="0" max="59">
                             <input type="number" id="s-${name}" placeholder="秒" min="0" max="59">
                         </div>
-                        <button class="set-btn" onclick="calculateRebirth('${name}')">設定</button>
-                        <button class="clear-btn" onclick="clearTimer('${name}')">清除</button>
+                        <button class="set-btn" onclick="calculateRebirth('${name}')">設定重生</button>
+                        <button class="clear-btn" onclick="clearTimer('${name}')">清除數據</button>
                     </div>
                 `;
             });
@@ -137,17 +143,15 @@
         const m = parseInt(document.getElementById(`m-${name}`).value) || 0;
         const s = parseInt(document.getElementById(`s-${name}`).value) || 0;
 
-        if (h === 0 && m === 0 && s === 0) return;
-
         const now = Date.now();
-        // 總毫秒數 = (輸入的剩餘時間 + 5分鐘緩衝) 換算成毫秒
+        // 剩餘時間 + 5分鐘緩衝
         const remainingMs = (h * 3600 + m * 60 + s) * 1000;
         const bufferMs = 5 * 60 * 1000;
         const rebirthTime = now + remainingMs + bufferMs;
 
         localStorage.setItem(`mush_${name}`, rebirthTime);
         
-        // 清空輸入框
+        // 清空輸入
         document.getElementById(`h-${name}`).value = '';
         document.getElementById(`m-${name}`).value = '';
         document.getElementById(`s-${name}`).value = '';
