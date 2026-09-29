@@ -1,8 +1,12 @@
 # customWebApps
 
+> 幾個單檔 HTML 小工具，各自一個資料夾，透過 GitHub Pages 發布。沒有 build、沒有後端，資料存在瀏覽器 localStorage。
+
+## 概覽
+
 幾個單檔 HTML 小工具，各自一個資料夾，透過 GitHub Pages 發布。沒有 build、沒有後端，資料存在瀏覽器 localStorage。
 
-## 工具
+## 主要功能／內容
 
 | 工具 | 網址 | 內容 |
 |---|---|---|
@@ -13,6 +17,16 @@
 蘑菇戰情室後來獨立成 [pikmin-mushroom-room](https://github.com/frobel0520/pikmin-mushroom-room)，改用 Supabase 讓家人即時同步；這裡的 `pikmin/` 是早期的單機版。
 
 根目錄沒有首頁，直接開各工具的網址。
+
+## 現況與已知限制
+
+這些是單檔 HTML 小工具，根目錄沒有首頁；蘑菇戰情室的即時同步版已移至獨立 repository。
+
+## 授權與來源
+
+Repository 根目錄未見授權檔；此 README 不另行宣告使用或再散布權利。
+
+---
 
 ## Harbor 整合
 
